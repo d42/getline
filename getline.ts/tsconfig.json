@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2015",
+    "declaration": true,
+    "outDir": "./dist",
+    "experimentalDecorators": true,
+    "strict": true
+  },
+  "include": [
+    "src/**/*",
+    "typings/**/*",
+    "./node_modules/web3-typescript-typings/index.d.ts"
+  ]
+}

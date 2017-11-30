@@ -6,7 +6,7 @@ import "../contracts/tokens/PrintableToken.sol";
 
 
 contract TestTokens {
-    function testPrintableToken() {
+    function testPrintableToken() public {
         uint256 testPrintValue = 100;
         PrintableToken testToken = new PrintableToken("testTokenName", 0, "testTokenSymbol", testPrintValue);
         Assert.equal(testToken.printValue(), testPrintValue, "It should initialize printValue");

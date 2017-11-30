@@ -19,7 +19,7 @@ contract TestGatheringTokens {
         collateralToken, loanToken, address(borrower), totalLoanNeeded, interestPermil);
     InvestorLedger.InvestorData investorData;
 
-    function testInitialization() {
+    function testInvestorLedger() public {
         testLedger.loanToken = loanToken;
         testLedger.collateralToken = collateralToken;
         Assert.equal(testLedger.totalAmountGathered, 0, "It should be initialy empty");
@@ -28,7 +28,7 @@ contract TestGatheringTokens {
         Assert.equal(testLedger.totalLoanNeeded, totalLoanNeeded, "Ledger be initialized with load needed");
     }
 
-    function testGatherCollateral() {
+    function testGatherCollateral() public {
         borrower.printMeCollateralTokens();
         Assert.equal(collateralToken.balanceOf(borrower), printValue, "It should print some tokens");
 
@@ -37,7 +37,7 @@ contract TestGatheringTokens {
         Assert.equal(testLedger.totalCollateral, printValue, "It should add collateral tokens");
     }
 
-    function testGatherInvestment() {
+    function testGatherInvestment() public {
         InvestorLedger.gatherInvestment(testLedger, address(investor));
         Assert.equal(testLedger.totalAmountGathered, 0, "Empty when investor has no loan tokens");
 
@@ -59,10 +59,22 @@ contract TestGatheringTokens {
 
     }
 
-    function testReleaseLoanToBorrower() {
+    function testReleaseLoanToBorrower() public {
         InvestorLedger.releaseLoanToBorrower(testLedger);
         Assert.equal(testLedger.loanWidthdrawn, true, "It should mark loan as withdrawn");
         Assert.equal(loanToken.balanceOf(borrower), printValue, "It should transfer tokens to borrower");
     }
-}
 
+    function TestPerson(PrintableToken _loanToken, PrintableToken _collateralToken) public {
+        loanToken = _loanToken;
+        collateralToken = _collateralToken;
+    }
+    function printMeCollateralTokens() public {
+        collateralToken.print(this);
+        collateralToken.approve(msg.sender, collateralToken.printValue());
+    }
+    function printMeLoanTokens() public {
+        loanToken.print(this);
+        loanToken.approve(msg.sender, loanToken.printValue());
+    }
+}

@@ -12,7 +12,7 @@ library InvestorLedger {
         IToken loanToken,
         address liege,
         uint256 totalLoanNeeded,
-        uint16 interestPermil) internal returns (Ledger account)
+        uint16 interestPermil) internal pure returns (Ledger account)
     {
         account.collateralToken = collateralToken;
         account.loanToken = loanToken;
@@ -24,7 +24,7 @@ library InvestorLedger {
         return account;
     }
 
-    function gatherCollateral(Ledger storage account) {
+    function gatherCollateral(Ledger storage account) public {
         var allowance = account.collateralToken.allowance(account.liege, this);
         account.totalCollateral += allowance;
         require(
@@ -36,7 +36,7 @@ library InvestorLedger {
         );
     }
 
-    function gatherInvestment(Ledger storage account, address trustee) {
+    function gatherInvestment(Ledger storage account, address trustee) public {
         var investmentAmount = Math.min(
             account.loanToken.allowance(trustee, this),
             account.totalLoanNeeded - account.totalAmountGathered
@@ -59,7 +59,7 @@ library InvestorLedger {
         investor.reservedCollateral += collateralReseverved;
     }
 
-    function gatherPayback(Ledger storage account) {
+    function gatherPayback(Ledger storage account) public {
         require(!account.loanCancelled && !account.loanDefaulted);
 
         require(account.loanToken.allowance(account.liege, this) >= account.totalPaybackNeeded);
@@ -68,7 +68,7 @@ library InvestorLedger {
         collateralToLiege(account);
     }
 
-    function markCancelled(Ledger storage account) {
+    function markCancelled(Ledger storage account) public {
         require(!account.loanCancelled && !account.loanDefaulted);
 
         account.loanCancelled = true;
@@ -76,13 +76,13 @@ library InvestorLedger {
         collateralToLiege(account);
     }
 
-    function markDefaulted(Ledger storage account) {
+    function markDefaulted(Ledger storage account) public {
         require(!account.loanCancelled && !account.loanDefaulted);
 
         account.loanDefaulted = true;
     }
 
-    function collateralToLiege(Ledger storage account) {
+    function collateralToLiege(Ledger storage account) public {
         var amountToTransfer = account.totalCollateral;
         if (account.loanDefaulted) {
             amountToTransfer -= account.totalCollateralReserved;
@@ -90,7 +90,7 @@ library InvestorLedger {
         require(account.collateralToken.transfer(account.liege, amountToTransfer));
     }
 
-    function collateralToTrustee(Ledger storage account, address trustee) {
+    function collateralToTrustee(Ledger storage account, address trustee) public {
         var investor = account.investors[trustee];
         var reservedCollateral = investor.reservedCollateral;
         investor.reservedCollateral = 0;
@@ -98,7 +98,7 @@ library InvestorLedger {
         delete account.investors[trustee];
     }
 
-    function withdrawInvestment(Ledger storage account, address trustee) {
+    function withdrawInvestment(Ledger storage account, address trustee) public {
         require(!account.loanDefaulted);
         var investor = account.investors[trustee];
         var amountInvested = investor.amountInvested;
@@ -110,7 +110,7 @@ library InvestorLedger {
         delete account.investors[trustee];
     }
 
-    function releaseLoanToBorrower(Ledger storage account) {
+    function releaseLoanToBorrower(Ledger storage account) public {
         require(account.loanWidthdrawn == false);
 
         account.loanWidthdrawn = true;
@@ -118,7 +118,7 @@ library InvestorLedger {
         require(account.loanToken.transfer(account.liege, account.totalAmountGathered));
     }
 
-    function isFullyFunded(Ledger storage account) constant returns (bool fullyFunded) {
+    function isFullyFunded(Ledger storage account) constant public returns (bool fullyFunded) {
         return account.totalAmountGathered == account.totalLoanNeeded;
     }
     
